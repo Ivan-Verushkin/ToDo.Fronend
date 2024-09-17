@@ -59,8 +59,7 @@ function AddNewToDo() {
     const listItem = document.createElement('div');
     listItem.innerText = inputValue.value;
     listItem.style.border = "1px solid black";
-    listItem.style.marginTop = "30px";
-    listItem.style.marginBottom = "30px";
+    listItem.style.marginTop = "60px";
     listItem.style.paddingTop = "30px";
     listItem.style.paddingBottom = "30px";
     listItem.style.color = "white";
