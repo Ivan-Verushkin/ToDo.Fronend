@@ -1,11 +1,6 @@
 const url = 'https://localhost:7262/api/ToDo';
 
-function httpGet(theUrl) {
-    var xmlHttp = new XMLHttpRequest();
-    xmlHttp.open("GET", theUrl, false); // false for synchronous request
-    xmlHttp.send(null);
-    return xmlHttp.responseText;
-}
+
 window.onload = function () {
 
     var response = httpGet(url);
@@ -52,7 +47,7 @@ function AddUpdateDeleteButtons(outputElement, id) {
 }
 function AddNewToDo() {
     const inputValue = document.getElementById('AddToDo');
-    if (inputValue.value === null) {
+    if (inputValue.value === null || inputValue.value === '') {
         return;
     }
     const outputElement = document.getElementById('output');
@@ -74,6 +69,13 @@ function AddNewToDo() {
     console.log(response);
 }
 
+function httpGet(theUrl) {
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.open("GET", theUrl, false); // false for synchronous request
+    xmlHttp.send(null);
+    return xmlHttp.responseText;
+}
+
 function httpPost(theUrl, input) {
     var xmlHttp = new XMLHttpRequest();
     xmlHttp.open("POST", theUrl, false); // false for synchronous request
@@ -87,7 +89,7 @@ function httpPost(theUrl, input) {
 
 function httpPut(theUrl, input) {
     var xmlHttp = new XMLHttpRequest();
-    xmlHttp.open("POST", theUrl, false); // false for synchronous request
+    xmlHttp.open("PUT", theUrl, false); // false for synchronous request
     xmlHttp.setRequestHeader("Content-Type", "application/json"); // Set Content-Type to JSON
 
     // Convert input object to JSON string
