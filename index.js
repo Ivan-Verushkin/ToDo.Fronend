@@ -1,8 +1,6 @@
 const url = 'https://localhost:7262/api/ToDo';
 
-
 window.onload = function () {
-
     var response = httpGet(url);
     // var response = '[{"id":1,"toDo":"Wash a car"},{"id":3,"toDo":"Watch a movie"}]';
     var array1 = JSON.parse(response);
@@ -24,6 +22,7 @@ window.onload = function () {
         AddUpdateDeleteButtons(outputElement, item.id);
     });
 }
+
 function AddUpdateDeleteButtons(outputElement, id) {
     const inputElement = document.createElement('div');
     inputElement.style.width = "600px";
@@ -45,6 +44,7 @@ function AddUpdateDeleteButtons(outputElement, id) {
     inputElement.appendChild(deleteButton);
     outputElement.appendChild(inputElement);
 }
+
 function AddNewToDo() {
     const inputValue = document.getElementById('AddToDo');
     if (inputValue.value === null || inputValue.value === '') {
