@@ -1,107 +1,120 @@
 const url = 'https://localhost:7262/api/ToDo';
 
-window.onload = function () {
-    var response = httpGet(url);
-    // var response = '[{"id":1,"toDo":"Wash a car"},{"id":3,"toDo":"Watch a movie"}]';
-    var array1 = JSON.parse(response);
-    console.log(array1);
-    const outputElement = document.getElementById('output');
-    array1.forEach(item => {
-        const listItem = document.createElement('div');
-        listItem.innerText = `${item.toDo}`;
-        listItem.style.border = "1px solid black";
-        listItem.style.marginTop = "60px";
-        listItem.style.paddingTop = "30px";
-        listItem.style.paddingBottom = "30px";
-        listItem.style.color = "white";
-        listItem.style.backgroundColor = "rgb(56, 175, 56)";
-        listItem.style.width = "600px";
-        listItem.style.textAlign = "center";
-        outputElement.appendChild(listItem);
-        const inputField = document.getElementById('#AddToDo');
-        AddUpdateDeleteButtons(outputElement, item.id);
-    });
+window.onload = async function () {
+    try {
+        const response = await httpGet(url);
+        const todos = JSON.parse(response);
+        console.log(todos);
+        const outputElement = document.getElementById('output');
+        todos.forEach(item => {
+            addToDoItem(outputElement, item.toDo, item.id);
+        });
+    } catch (error) {
+        console.error('Error loading todos:', error);
+    }
 }
 
-function AddUpdateDeleteButtons(outputElement, id) {
+function addToDoItem(outputElement, text, id) {
+    const listItem = document.createElement('div');
+    listItem.innerText = text;
+    listItem.classList.add('todo-item');
+    outputElement.appendChild(listItem);
+    
+    AddUpdateDeleteButtons(outputElement, listItem, text, id);
+}
+
+function AddUpdateDeleteButtons(outputElement, listItem, text, id) {
     const inputElement = document.createElement('div');
-    inputElement.style.width = "600px";
-    inputElement.style.height = "50px";
-    const updateButton = document.createElement('button');
-    updateButton.innerText = 'Update';
-    updateButton.style.width = "300px";
-    updateButton.style.height = "50px";
-    updateButton.style.backgroundColor = 'rgb(150, 146, 250)';
-    updateButton.style.color = "white";
+    inputElement.classList.add('button-container');
+
+    // Update Button with PUT logic
+    const updateButton = createButton('Update', 'button-update', () => {
+        const updatedToDo = prompt('Update the task:', text); // Prompt user for updated task
+
+        if (updatedToDo) {
+            const updatedItem = { id, toDo: updatedToDo }; // Create updated item object
+            httpPut(`${url}/${id}`, updatedItem) // Call PUT with the new data
+                .then(response => {
+                    console.log('Item updated successfully:', response);
+                    listItem.innerText = updatedToDo; // Update the UI directly
+                })
+                .catch(error => console.error('Error updating todo:', error));
+        }
+    });
+
     inputElement.appendChild(updateButton);
-    const deleteButton = document.createElement('button');
-    deleteButton.onclick = function () { httpDelete(url, id) };
-    deleteButton.innerText = 'Delete';
-    deleteButton.style.width = "300px";
-    deleteButton.style.height = "50px";
-    deleteButton.style.backgroundColor = 'rgb(255, 90, 90)';
-    deleteButton.style.color = "white";
+
+    // Delete Button with DELETE logic
+    const deleteButton = createButton('Delete', 'button-delete', () => {
+        httpDelete(url, id)
+            .then(response => {
+                console.log('Item deleted successfully:', response);
+                listItem.remove(); // Remove the item from the UI
+                inputElement.remove(); // Remove the buttons from the UI
+            })
+            .catch(error => console.error('Error deleting todo:', error));
+    });
+
     inputElement.appendChild(deleteButton);
     outputElement.appendChild(inputElement);
 }
 
-function AddNewToDo() {
-    const inputValue = document.getElementById('AddToDo');
-    if (inputValue.value === null || inputValue.value === '') {
-        return;
-    }
+function createButton(text, className, onClick) {
+    const button = document.createElement('button');
+    button.innerText = text;
+    button.classList.add(className);
+    button.onclick = onClick;
+    return button;
+}
+
+async function AddNewToDo() {
+    const inputValue = document.getElementById('AddToDo').value;
+    if (!inputValue) return;
+
     const outputElement = document.getElementById('output');
-    const listItem = document.createElement('div');
-    listItem.innerText = inputValue.value;
-    listItem.style.border = "1px solid black";
-    listItem.style.marginTop = "60px";
-    listItem.style.paddingTop = "30px";
-    listItem.style.paddingBottom = "30px";
-    listItem.style.color = "white";
-    listItem.style.backgroundColor = "rgb(56, 175, 56)";
-    listItem.style.width = "600px";
-    listItem.style.textAlign = "center";
-    outputElement.appendChild(listItem);
-    var response = httpPost(url, inputValue.value);
-    const array2 = JSON.parse(response);
-    var position = array2[array2.length - 1].id;
-    AddUpdateDeleteButtons(outputElement, position);
-    console.log(response);
+    try {
+        const response = await httpPost(url, { toDo: inputValue });
+        const newTodo = JSON.parse(response);
+        const newId = newTodo.id;
+
+        addToDoItem(outputElement, inputValue, newId);
+    } catch (error) {
+        console.error('Error adding todo:', error);
+    }
 }
 
-function httpGet(theUrl) {
-    var xmlHttp = new XMLHttpRequest();
-    xmlHttp.open("GET", theUrl, false); // false for synchronous request
-    xmlHttp.send(null);
-    return xmlHttp.responseText;
+// Fetch request functions
+
+async function httpGet(theUrl) {
+    const response = await fetch(theUrl);
+    if (!response.ok) throw new Error('Network response was not ok');
+    return await response.text();
 }
 
-function httpPost(theUrl, input) {
-    var xmlHttp = new XMLHttpRequest();
-    xmlHttp.open("POST", theUrl, false); // false for synchronous request
-    xmlHttp.setRequestHeader("Content-Type", "application/json"); // Set Content-Type to JSON
-
-    // Convert input object to JSON string
-    var jsonInput = JSON.stringify(input);
-    xmlHttp.send(jsonInput);
-    return xmlHttp.responseText;
+async function httpPost(theUrl, input) {
+    const response = await fetch(theUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(input)
+    });
+    if (!response.ok) throw new Error('Network response was not ok');
+    return await response.text();
 }
 
-function httpPut(theUrl, input) {
-    var xmlHttp = new XMLHttpRequest();
-    xmlHttp.open("PUT", theUrl, false); // false for synchronous request
-    xmlHttp.setRequestHeader("Content-Type", "application/json"); // Set Content-Type to JSON
-
-    // Convert input object to JSON string
-    var jsonInput = JSON.stringify(input);
-    xmlHttp.send(jsonInput);
-    return xmlHttp.responseText;
+async function httpPut(theUrl, input) {
+    const response = await fetch(theUrl, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(input)
+    });
+    if (!response.ok) throw new Error('Network response was not ok');
+    return await response.text();
 }
 
-function httpDelete(theUrl, id) {
-    var xmlHttp = new XMLHttpRequest();
-    xmlHttp.open("DELETE", theUrl + "/" + id, false); // false for synchronous request
-    xmlHttp.send(null);
-    location.reload();
-    return xmlHttp.responseText;
+async function httpDelete(theUrl, id) {
+    const response = await fetch(`${theUrl}/${id}`, {
+        method: "DELETE"
+    });
+    if (!response.ok) throw new Error('Network response was not ok');
+    return await response.text();
 }

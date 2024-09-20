@@ -66,3 +66,54 @@ h1 {
 .btn:active{
     opacity: 0.5;
 }
+
+/* Style for the to-do items */
+.todo-item {
+    border: 2px solid green;  /* Green border */
+    margin-top: 20px;         /* Space between items */
+    padding: 20px;            /* Inner padding for readability */
+    background-color: #f0fff0; /* Light green background */
+    color: black;             /* Black text for readability */
+    width: 600px;             /* Set width */
+    text-align: center;       /* Center the text */
+    border-radius: 10px;      /* Rounded corners */
+    font-size: 18px;          /* Adjust font size */
+    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+/* Style for the button container */
+.button-container {
+    margin-top: 10px;         /* Space between buttons and todo item */
+    display: flex;            /* Make buttons appear side-by-side */
+    justify-content: space-around; /* Space buttons evenly */
+}
+
+/* Style for the update and delete buttons */
+.button-update, .button-delete {
+    width: 150px;             /* Button width */
+    height: 40px;             /* Button height */
+    color: white;             /* White text */
+    border: none;             /* Remove default borders */
+    border-radius: 5px;       /* Rounded corners */
+    font-size: 16px;          /* Font size */
+    cursor: pointer;          /* Pointer cursor on hover */
+    transition: background-color 0.3s ease; /* Smooth transition on hover */
+}
+
+/* Style for the update button */
+.button-update {
+    background-color: #4caf50; /* Green background */
+}
+
+.button-update:hover {
+    background-color: #45a049; /* Darker green on hover */
+}
+
+/* Style for the delete button */
+.button-delete {
+    background-color: #f44336; /* Red background */
+}
+
+.button-delete:hover {
+    background-color: #d32f2f; /* Darker red on hover */
+}
