@@ -75,7 +75,7 @@ async function AddNewToDo() {
     try {
         const response = await httpPost(url, { toDo: inputValue });
         const newTodo = JSON.parse(response);
-        const newId = newTodo.id;
+        const newId = newTodo[newTodo.length-1].id;
 
         addToDoItem(outputElement, inputValue, newId);
     } catch (error) {
